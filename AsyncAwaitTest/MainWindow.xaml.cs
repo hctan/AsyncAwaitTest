@@ -29,13 +29,22 @@ namespace AsyncAwaitTest
 
         private async void OnClick(object sender, RoutedEventArgs e)
         {
-            using (Stream stream = await GetWebPageAsync())
+            try
             {
-                using (var fileStream = new FileStream(@"C:\temp\test.txt", FileMode.Create))
+                using (Stream stream = await GetWebPageAsync())
                 {
-                    await stream.CopyToAsync(fileStream);
-                    StatusLabel.Content = "Done...";
+                    using (var fileStream = new FileStream(@"C:\temp\test.txt", FileMode.Create))
+                    {
+                        await stream.CopyToAsync(fileStream);
+                        StatusLabel.Content = "Done...";
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                StatusLabel.Content = string.Format("An exception occurred: {0}{1}Stack Trace:{1}{2}",
+                    ex.Message, Environment.NewLine, ex.StackTrace);
+                StatusLabel.Foreground = Brushes.Red;
             }
         }
 
